@@ -33,6 +33,9 @@ export class Medication {
 
   @Prop({ default: false })
   isCompleted: boolean;
+
+  @Prop({ default: false })
+  isMedicationChanged: boolean;
 }
 
 export const MedicationShema = SchemaFactory.createForClass(Medication);
