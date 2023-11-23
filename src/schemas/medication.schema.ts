@@ -23,7 +23,7 @@ export class Medication {
   diagnosis: string;
 
   @Prop()
-  timesToBeTakeb: number;
+  timesToBeTaken: number;
 
   @Prop()
   dosage: number;
