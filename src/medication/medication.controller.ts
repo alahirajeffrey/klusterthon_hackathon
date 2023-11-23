@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Param, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { MedicationService } from './medication.service';
 // import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ChangeMedicationDto } from './dto/update-medication.dto';
+import { CreateMedicationDto } from './dto/create-medication.dto';
 
 // @UseGuards(JwtGuard)
 // @ApiSecurity('JWT-auth')
@@ -44,5 +45,17 @@ export class MedicationController {
     @Param('patientId') patientId: string,
   ) {
     return this.medicationService.completeMedication(patientId, medicationId);
+  }
+
+  @Post('')
+  @ApiOperation({ summary: 'Create medication and reminders' })
+  createMedication(@Body() dto: CreateMedicationDto) {
+    return this.medicationService.createMedication(dto);
+  }
+
+  @Patch('reminder/complete/:reminderId')
+  @ApiOperation({ summary: 'Mark reminder as taken' })
+  markReminderAsTaken(@Param('reminderId') reminderId: string) {
+    return this.medicationService.markReminderAsTaken(reminderId);
   }
 }
