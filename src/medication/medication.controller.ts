@@ -1,7 +1,8 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch } from '@nestjs/common';
 import { MedicationService } from './medication.service';
 // import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ChangeMedicationDto } from './dto/update-medication.dto';
 
 // @UseGuards(JwtGuard)
 // @ApiSecurity('JWT-auth')
@@ -14,5 +15,19 @@ export class MedicationController {
   @ApiOperation({ summary: 'Get a patient by id' })
   getPatientById(@Param('medicationId') medicationId: string) {
     return this.medicationService.getMedicationDetailsById(medicationId);
+  }
+
+  @Patch(':medicationId/:doctorId')
+  @ApiOperation({ summary: 'Change a patient medication' })
+  changePatientMedication(
+    @Param('medicationId') medicationId: string,
+    @Param('doctorId') doctorId: string,
+    @Body() dto: ChangeMedicationDto,
+  ) {
+    return this.medicationService.changePatientMedication(
+      medicationId,
+      doctorId,
+      dto,
+    );
   }
 }
