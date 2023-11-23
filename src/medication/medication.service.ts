@@ -16,6 +16,8 @@ import { Patient_Doctor } from 'src/schemas/patient_doctor.schema';
 import { Reminder } from 'src/schemas/reminder.schema';
 import { ChangeMedicationDto } from './dto/update-medication.dto';
 import { CreateMedicationDto } from './dto/create-medication.dto';
+import { CreateReminderDto } from './dto/create-reminder.dto';
+import { ApiResponse } from 'src/common/types/response.type';
 
 @Injectable()
 export class MedicationService {
@@ -37,7 +39,7 @@ export class MedicationService {
    * @param medicationId : id of medication
    * @returns : 200 and medication object
    */
-  async getMedicationDetailsById(medicationId: string) {
+  async getMedicationDetailsById(medicationId: string): Promise<ApiResponse> {
     try {
       const medication = await this.medicationModel.findById(medicationId);
       if (!medication) {
@@ -71,7 +73,7 @@ export class MedicationService {
     medicationId: string,
     doctorId: string,
     dto: ChangeMedicationDto,
-  ) {
+  ): Promise<ApiResponse> {
     try {
       const medication = await this.medicationModel.findById(medicationId);
       if (!medication) {
@@ -125,7 +127,7 @@ export class MedicationService {
    * @param patientId : id of patient
    * @returns 200 and list of medications
    */
-  async getPatientHistory(patientId: string) {
+  async getPatientHistory(patientId: string): Promise<ApiResponse> {
     try {
       // get all medications and sort by latest
       const history = await this.medicationModel
@@ -158,7 +160,10 @@ export class MedicationService {
    * @param medicationId : id of medication
    * @returns : 200 and response message
    */
-  async completeMedication(patientId: string, medicationId: string) {
+  async completeMedication(
+    patientId: string,
+    medicationId: string,
+  ): Promise<ApiResponse> {
     try {
       const patient = await this.patientModel.findById(patientId);
       if (!patient) {
@@ -210,7 +215,7 @@ export class MedicationService {
    * @param dto : create medication dto
    * @returns : 201 and medication details
    */
-  async createMedication(dto: CreateMedicationDto) {
+  async createMedication(dto: CreateMedicationDto): Promise<ApiResponse> {
     try {
       const isDoctor = await this.doctorModel.findById(dto.doctorId);
       if (!isDoctor) {
@@ -229,13 +234,51 @@ export class MedicationService {
         durationInHours: dto.durationInHours,
       });
 
-      // get current time,
-      // use loop to create number of reminders based on the number of times the drug is to be taken
-      // create reminder
-
       return {
         statusCode: HttpStatus.CREATED,
         data: { newMedication },
+      };
+    } catch (error) {
+      this.logger.error(error);
+      throw new HttpException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /**
+   * craete reminder
+   * @param dto : create reminder dto
+   * @returns : 201 and reminder object
+   */
+  async addReminder(dto: CreateReminderDto): Promise<ApiResponse> {
+    try {
+      const medication = await this.medicationModel.findById(dto.medicationId);
+      if (!medication) {
+        throw new HttpException(
+          'Medication does not exist',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      const patient = await this.patientModel.findById(dto.patientId);
+      if (!patient) {
+        throw new HttpException('Patient does not exist', HttpStatus.NOT_FOUND);
+      }
+
+      const reminder = await this.reminderModel.create({
+        patientId: medication.patientId,
+        medicationId: dto.medicationId,
+        patientMobileNumber: patient.mobileNumber,
+        time: dto.time,
+        medicationName: medication.medicationName,
+        dosage: medication.dosage,
+      });
+
+      return {
+        statusCode: HttpStatus.CREATED,
+        data: { reminder },
       };
     } catch (error) {
       this.logger.error(error);
@@ -251,7 +294,7 @@ export class MedicationService {
    * @param reminderId : id of the reminder
    * @returns : 200 and message
    */
-  async markReminderAsTaken(reminderId: string) {
+  async markReminderAsTaken(reminderId: string): Promise<ApiResponse> {
     try {
       const reminder = await this.reminderModel.findById(reminderId);
       if (!reminder) {
@@ -269,6 +312,103 @@ export class MedicationService {
       return {
         statusCode: HttpStatus.CREATED,
         data: { message: 'Drrug taken' },
+      };
+    } catch (error) {
+      this.logger.error(error);
+      throw new HttpException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /**
+   * get all reminders for a medication
+   * @param medicationId : id of medication
+   * @returns : 200 and list of reminders
+   */
+  async getRemindersForMedication(medicationId: string): Promise<ApiResponse> {
+    try {
+      const reminders = await this.reminderModel.find({
+        medicationId: medicationId,
+      });
+      if (!reminders) {
+        throw new HttpException(
+          'Medication does not exist',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      return {
+        statusCode: HttpStatus.OK,
+        data: { reminders },
+      };
+    } catch (error) {
+      this.logger.error(error);
+      throw new HttpException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /**
+   * update the time of a reminder
+   * @param reminderId : id of reminder
+   * @param dto : create reminder dto
+   * @returns : 200 and message
+   */
+  async updateReminder(
+    reminderId: string,
+    dto: CreateReminderDto,
+  ): Promise<ApiResponse> {
+    try {
+      const reminder = await this.reminderModel.findById(reminderId);
+      if (!reminder) {
+        throw new HttpException(
+          'Reminder does not exist',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      await this.reminderModel.updateOne(
+        { _id: reminderId },
+        { time: dto.time },
+      );
+
+      return {
+        statusCode: HttpStatus.OK,
+        data: { message: 'Reminder updated' },
+      };
+    } catch (error) {
+      this.logger.error(error);
+      throw new HttpException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /**
+   * delete a reminder
+   * @param reminderId : id of reminder
+   * @returns 200 and message
+   */
+  async deleteReminder(reminderId: string): Promise<ApiResponse> {
+    try {
+      const reminder = await this.reminderModel.findById(reminderId);
+      if (!reminder) {
+        throw new HttpException(
+          'Reminder does not exist',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      await this.reminderModel.deleteOne({ _id: reminderId });
+
+      return {
+        statusCode: HttpStatus.OK,
+        data: { message: 'Reminder deleted' },
       };
     } catch (error) {
       this.logger.error(error);

@@ -1,9 +1,18 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { MedicationService } from './medication.service';
 // import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ChangeMedicationDto } from './dto/update-medication.dto';
 import { CreateMedicationDto } from './dto/create-medication.dto';
+import { CreateReminderDto } from './dto/create-reminder.dto';
 
 // @UseGuards(JwtGuard)
 // @ApiSecurity('JWT-auth')
@@ -57,5 +66,32 @@ export class MedicationController {
   @ApiOperation({ summary: 'Mark reminder as taken' })
   markReminderAsTaken(@Param('reminderId') reminderId: string) {
     return this.medicationService.markReminderAsTaken(reminderId);
+  }
+
+  @Post('reminder')
+  @ApiOperation({ summary: 'Create reminder for a medication ' })
+  addReminder(@Body() dto: CreateReminderDto) {
+    return this.medicationService.addReminder(dto);
+  }
+
+  @Get('reminder/:medicationId')
+  @ApiOperation({ summary: 'Get reminders for a medication' })
+  getRemindersForMedication(@Param('medicationId') medicationId: string) {
+    return this.medicationService.getRemindersForMedication(medicationId);
+  }
+
+  @Patch('reminder/:reminderId')
+  @ApiOperation({ summary: 'Update time of a reminder' })
+  updateReminder(
+    @Param('reminderId') reminderId: string,
+    @Body() dto: CreateReminderDto,
+  ) {
+    return this.medicationService.updateReminder(reminderId, dto);
+  }
+
+  @Delete('reminder/:reminderId')
+  @ApiOperation({ summary: 'Delete  a reminder' })
+  deleteReminder(@Param('reminderId') reminderId: string) {
+    return this.medicationService.deleteReminder(reminderId);
   }
 }
