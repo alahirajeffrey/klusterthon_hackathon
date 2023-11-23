@@ -7,9 +7,11 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { config } from './common/config/config';
 import { MedicationModule } from './medication/medication.module';
 import { PatientModule } from './patient/patient.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     MongooseModule.forRoot(config.MONGO_URI),
     AuthModule,
     ConfigModule.forRoot({ isGlobal: true }),
