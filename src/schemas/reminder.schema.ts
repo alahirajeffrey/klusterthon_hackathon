@@ -19,8 +19,17 @@ export class Reminder {
   @Prop()
   time: Date;
 
+  @Prop()
+  patientMobileNumber: string;
+
   @Prop({ default: false })
   isTaken: boolean;
+
+  @Prop()
+  medicationName: string;
+
+  @Prop()
+  dosage: number;
 }
 
 export const ReminderShema = SchemaFactory.createForClass(Reminder);
