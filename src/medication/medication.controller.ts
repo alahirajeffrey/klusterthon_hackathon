@@ -12,7 +12,7 @@ export class MedicationController {
   constructor(private medicationService: MedicationService) {}
 
   @Get(':medicationId')
-  @ApiOperation({ summary: 'Get a patient by id' })
+  @ApiOperation({ summary: 'Get a patient medication by id' })
   getPatientById(@Param('medicationId') medicationId: string) {
     return this.medicationService.getMedicationDetailsById(medicationId);
   }
@@ -35,5 +35,14 @@ export class MedicationController {
   @ApiOperation({ summary: 'Get patient history' })
   getPatientHistory(@Param('patientId') patientId: string) {
     return this.medicationService.getPatientHistory(patientId);
+  }
+
+  @Patch('complete/:medicationId/:patientId')
+  @ApiOperation({ summary: 'Complete a medication' })
+  completeMedication(
+    @Param('medicationId') medicationId: string,
+    @Param('patientId') patientId: string,
+  ) {
+    return this.medicationService.completeMedication(patientId, medicationId);
   }
 }

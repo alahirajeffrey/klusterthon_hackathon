@@ -90,7 +90,7 @@ export class MedicationService {
 
       // set old medication to changed
       await this.medicationModel.updateOne(
-        { id: medicationId },
+        { _id: medicationId },
         {
           isMedicationChanged: true,
         },
@@ -131,6 +131,7 @@ export class MedicationService {
         .find({ patientId: patientId })
         .sort({ createdAt: -1 });
 
+      console.log(history);
       if (history.length === 0) {
         throw new HttpException(
           'Patient history not found',
@@ -140,6 +141,59 @@ export class MedicationService {
       return {
         statusCode: HttpStatus.OK,
         data: { history },
+      };
+    } catch (error) {
+      this.logger.error(error);
+      throw new HttpException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /**
+   * complete medication
+   * @param patientId : id of patient
+   * @param medicationId : id of medication
+   * @returns : 200 and response message
+   */
+  async completeMedication(patientId: string, medicationId: string) {
+    try {
+      const patient = await this.patientModel.findById(patientId);
+      if (!patient) {
+        throw new HttpException('Patient does not exist', HttpStatus.NOT_FOUND);
+      }
+
+      const medication = await this.medicationModel.findById(medicationId);
+      if (!medication) {
+        throw new HttpException(
+          'Medication does not exist',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      if (medication.isCompleted === true) {
+        throw new HttpException(
+          'Medication has already been completed',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      if (String(medication.patientId.id) !== String(patient._id)) {
+        throw new HttpException(
+          'You cannot mark a medication that is not yours as complete',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      await this.medicationModel.updateOne(
+        { _id: medicationId },
+        { isCompleted: true },
+      );
+
+      return {
+        statusCode: HttpStatus.OK,
+        data: { message: 'Medication completed' },
       };
     } catch (error) {
       this.logger.error(error);
