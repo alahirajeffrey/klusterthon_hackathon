@@ -15,6 +15,7 @@ import { Patient } from 'src/schemas/patient.schema';
 import { Patient_Doctor } from 'src/schemas/patient_doctor.schema';
 import { Reminder } from 'src/schemas/reminder.schema';
 import { ChangeMedicationDto } from './dto/update-medication.dto';
+import { CreateMedicationDto } from './dto/create-medication.dto';
 
 @Injectable()
 export class MedicationService {
@@ -204,8 +205,71 @@ export class MedicationService {
     }
   }
 
-  async createMedication() {
+  /**
+   * create medication
+   * @param dto : create medication dto
+   * @returns : 201 and medication details
+   */
+  async createMedication(dto: CreateMedicationDto) {
     try {
+      const isDoctor = await this.doctorModel.findById(dto.doctorId);
+      if (!isDoctor) {
+        throw new HttpException(
+          'Only a doctor can put a patient on medication',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+      const newMedication = await this.medicationModel.create({
+        patientId: dto.patientId,
+        doctorId: dto.doctorId,
+        medicationName: dto.medicationName,
+        diagnosis: dto.diagnosis,
+        timesToBeTaken: dto.timesToBeTaken,
+        dosage: dto.dosage,
+        durationInHours: dto.durationInHours,
+      });
+
+      // get current time,
+      // use loop to create number of reminders based on the number of times the drug is to be taken
+      // create reminder
+
+      return {
+        statusCode: HttpStatus.CREATED,
+        data: { newMedication },
+      };
+    } catch (error) {
+      this.logger.error(error);
+      throw new HttpException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /**
+   * mark drug and reminder as taken
+   * @param reminderId : id of the reminder
+   * @returns : 200 and message
+   */
+  async markReminderAsTaken(reminderId: string) {
+    try {
+      const reminder = await this.reminderModel.findById(reminderId);
+      if (!reminder) {
+        throw new HttpException(
+          'Reminder does not exist',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      await this.reminderModel.updateOne(
+        { _id: reminderId },
+        { isTaken: true },
+      );
+
+      return {
+        statusCode: HttpStatus.CREATED,
+        data: { message: 'Drrug taken' },
+      };
     } catch (error) {
       this.logger.error(error);
       throw new HttpException(
