@@ -10,10 +10,7 @@ import { PatientModule } from './patient/patient.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(
-      // 'mongodb+srv://alahira:Xu4imxJxxdNh9gMQ@testcluster.vyyjz.mongodb.net/',
-      config.MONGO_URI,
-    ),
+    MongooseModule.forRoot(config.MONGO_URI),
     AuthModule,
     ConfigModule.forRoot({ isGlobal: true }),
     WinstonModule.forRoot({
