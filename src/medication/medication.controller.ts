@@ -30,4 +30,10 @@ export class MedicationController {
       dto,
     );
   }
+
+  @Get('patient/:patientId')
+  @ApiOperation({ summary: 'Get patient history' })
+  getPatientHistory(@Param('patientId') patientId: string) {
+    return this.medicationService.getPatientHistory(patientId);
+  }
 }
