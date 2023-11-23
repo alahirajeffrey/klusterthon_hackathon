@@ -14,6 +14,7 @@ import { Medication } from 'src/schemas/medication.schema';
 import { Patient } from 'src/schemas/patient.schema';
 import { Patient_Doctor } from 'src/schemas/patient_doctor.schema';
 import { Reminder } from 'src/schemas/reminder.schema';
+import { ChangeMedicationDto } from './dto/update-medication.dto';
 
 @Injectable()
 export class MedicationService {
@@ -58,7 +59,67 @@ export class MedicationService {
     }
   }
 
-  async getPatientMedication() {
+  /**
+   * change a patient's medication
+   * @param medicationId : id of medication
+   * @param doctorId : id of doctor
+   * @param dto : update medication dto
+   * @returns : 201 and new medication object
+   */
+  async changePatientMedication(
+    medicationId: string,
+    doctorId: string,
+    dto: ChangeMedicationDto,
+  ) {
+    try {
+      const medication = await this.medicationModel.findById(medicationId);
+      if (!medication) {
+        throw new HttpException(
+          'Medication does not exist',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      const doctor = await this.doctorModel.findById(doctorId);
+      if (!doctor) {
+        throw new HttpException(
+          'Only doctors can change a patient medication',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+
+      // set old medication to changed
+      await this.medicationModel.updateOne(
+        { id: medicationId },
+        {
+          isMedicationChanged: true,
+        },
+      );
+
+      const newMedication = await this.medicationModel.create({
+        patientId: medication.patientId,
+        doctorId: doctorId,
+        medicationName: dto.medicationName,
+        diagnosis: dto.diagnosis,
+        timesToBeTakeb: dto.timesToBeTaken,
+        dosage: dto.dosage,
+        durationInHours: dto.durationInHours,
+      });
+
+      return {
+        statusCode: HttpStatus.CREATED,
+        data: { newMedication },
+      };
+    } catch (error) {
+      this.logger.error(error);
+      throw new HttpException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async getPatientMedications() {
     try {
     } catch (error) {
       this.logger.error(error);
@@ -70,17 +131,6 @@ export class MedicationService {
   }
 
   async createMedication() {
-    try {
-    } catch (error) {
-      this.logger.error(error);
-      throw new HttpException(
-        error.message,
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
-  async updatePatientMedication() {
     try {
     } catch (error) {
       this.logger.error(error);
