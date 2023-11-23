@@ -119,8 +119,28 @@ export class MedicationService {
     }
   }
 
-  async getPatientMedications() {
+  /**
+   * get a patients history
+   * @param patientId : id of patient
+   * @returns 200 and list of medications
+   */
+  async getPatientHistory(patientId: string) {
     try {
+      // get all medications and sort by latest
+      const history = await this.medicationModel
+        .find({ patientId: patientId })
+        .sort({ createdAt: -1 });
+
+      if (history.length === 0) {
+        throw new HttpException(
+          'Patient history not found',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      return {
+        statusCode: HttpStatus.OK,
+        data: { history },
+      };
     } catch (error) {
       this.logger.error(error);
       throw new HttpException(
