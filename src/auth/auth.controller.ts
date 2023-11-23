@@ -38,7 +38,7 @@ export class AuthController {
   @UseGuards(JwtGuard)
   @ApiSecurity('JWT-auth')
   @Patch('change-password/:userId')
-  @ApiOperation({ summary: 'Change a user password' })
+  @ApiOperation({ summary: 'Change user password' })
   changePassword(
     @Body() dto: ChangePasswordDto,
     @Param('userId') userId: string,
