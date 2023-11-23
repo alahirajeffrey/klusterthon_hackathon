@@ -13,8 +13,8 @@ export class Reminder {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Patient' })
   patientId: Patient;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Medication' }] })
-  medicationId: Medication[];
+  @Prop({ type: { type: mongoose.Schema.Types.ObjectId, ref: 'Medication' } })
+  medicationId: Medication;
 
   @Prop()
   time: Date;
