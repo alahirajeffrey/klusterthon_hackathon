@@ -8,10 +8,10 @@ export class Patient_Doctor {
   @Prop()
   id: mongoose.Schema.Types.ObjectId;
 
-  @Prop({ type: { type: mongoose.Schema.Types.ObjectId, ref: 'Patient' } })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Patient' })
   patient: string;
 
-  @Prop({ type: { type: mongoose.Schema.Types.ObjectId, ref: 'Doctor' } })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Doctor' })
   doctor: string;
 }
 
