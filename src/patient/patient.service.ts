@@ -13,6 +13,7 @@ import { Doctor } from 'src/schemas/doctor.schema';
 import { Patient } from 'src/schemas/patient.schema';
 import { Patient_Doctor } from 'src/schemas/patient_doctor.schema';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UtilService } from 'src/utils/util.service';
 
 @Injectable()
 export class PatientService {
@@ -22,6 +23,7 @@ export class PatientService {
     @InjectModel(Patient_Doctor.name)
     private patientDoctorModel: Model<Patient_Doctor>,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    private utilService: UtilService,
   ) {}
 
   /**
@@ -128,7 +130,7 @@ export class PatientService {
         {
           firstName: dto.firstName,
           lastName: dto.lastName,
-          mobileNumber: dto.mobileNumber,
+          mobileNumber: this.utilService.parseMobileNumber(dto.mobileNumber),
         },
       );
 
