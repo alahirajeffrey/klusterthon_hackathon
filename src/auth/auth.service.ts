@@ -311,16 +311,19 @@ export class AuthService {
    */
   async requestEmailVerification(userId: string) {
     try {
+      // check if patient eixts
       const patient = await this.patientModel.findById(userId);
+
+      // if patient does not eixts, check if doctor exists and send otp
       if (!patient) {
         const doctor = await this.doctorModel.findById(userId);
         if (doctor) {
           const otp = this.utilService.generateOtp();
 
-          await this.emailService.sendEmailVerificationOtp(
-            doctor.mobileNumber,
-            otp,
-          );
+          // check if there is an existing otp and delete
+          await this.otpModel.deleteOne({ doctorId: doctor._id });
+
+          await this.emailService.sendEmailVerificationOtp(doctor.email, otp);
 
           await this.otpModel.create({
             otp: otp,
@@ -333,15 +336,17 @@ export class AuthService {
           };
         }
 
+        // return not found error if doctor does not exist
         throw new HttpException('User does not exist', HttpStatus.NOT_FOUND);
       }
 
+      // verify email if patient exist and send otp
       const otp = this.utilService.generateOtp();
 
-      await this.emailService.sendEmailVerificationOtp(
-        patient.mobileNumber,
-        otp,
-      );
+      // check if there is an existing otp and delete
+      await this.otpModel.deleteOne({ doctorId: patient._id });
+
+      await this.emailService.sendEmailVerificationOtp(patient.email, otp);
 
       await this.otpModel.create({
         otp: otp,
@@ -361,13 +366,22 @@ export class AuthService {
     }
   }
 
+  /**
+   * verify email
+   * @param userId : if of user
+   * @param dto : email verification dto
+   * @returns 200 and message
+   */
   async verifyEmail(userId: string, dto: VerifyEmailDto) {
     try {
+      // check if patient exist
       const patient = await this.patientModel.findById(userId);
+
+      // if patient does not exist, check if doctor exist and verify
       if (!patient) {
         const doctor = await this.doctorModel.findById(userId);
         if (doctor) {
-          const userOtp = await this.otpModel.findById(userId);
+          const userOtp = await this.otpModel.findOne({ doctorId: userId });
 
           if (userOtp.otp !== dto.otp) {
             throw new HttpException('Incorrect otp', HttpStatus.UNAUTHORIZED);
@@ -386,9 +400,12 @@ export class AuthService {
           };
         }
 
+        // return error if patient and doctor do not exist
         throw new HttpException('User does not exist', HttpStatus.NOT_FOUND);
       }
-      const userOtp = await this.otpModel.findById(userId);
+
+      // verify email if patient exist
+      const userOtp = await this.otpModel.findOne({ patientId: userId });
 
       if (userOtp.otp !== dto.otp) {
         throw new HttpException('Incorrect otp', HttpStatus.UNAUTHORIZED);
