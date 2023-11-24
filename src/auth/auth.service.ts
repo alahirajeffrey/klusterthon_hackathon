@@ -37,10 +37,23 @@ export class AuthService {
   async registerPatient(dto: RegisterUserDto): Promise<ApiResponse> {
     try {
       // check if user exists
-      const emailExists = await this.patientModel.findOne({ email: dto.email });
-      if (emailExists) {
+      const patientEmailExists = await this.patientModel.findOne({
+        email: dto.email,
+      });
+      if (patientEmailExists) {
         throw new HttpException(
-          'User with email already exists',
+          'Patient with email already exists',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+
+      // check if user exists
+      const doctorEmailExists = await this.doctorModel.findOne({
+        email: dto.email,
+      });
+      if (doctorEmailExists) {
+        throw new HttpException(
+          'Doctor with email already exists',
           HttpStatus.UNAUTHORIZED,
         );
       }
@@ -78,10 +91,23 @@ export class AuthService {
   async registerDoctor(dto: RegisterUserDto): Promise<ApiResponse> {
     try {
       // check if user exists
-      const emailExists = await this.doctorModel.findOne({ email: dto.email });
-      if (emailExists) {
+      const doctorEmailExists = await this.doctorModel.findOne({
+        email: dto.email,
+      });
+      if (doctorEmailExists) {
         throw new HttpException(
-          'User with email already exists',
+          'Doctor with email already exists',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+
+      // check if user exists
+      const patientEmailExists = await this.patientModel.findOne({
+        email: dto.email,
+      });
+      if (patientEmailExists) {
+        throw new HttpException(
+          'Patient with email already exists',
           HttpStatus.UNAUTHORIZED,
         );
       }
