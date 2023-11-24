@@ -6,11 +6,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { MessageService } from 'src/utils/message.service';
 
 @Module({
-  providers: [ReminderService],
+  providers: [ReminderService, MessageService],
   imports: [
     MongooseModule.forFeature([{ name: Reminder.name, schema: ReminderShema }]),
     JwtModule.register({}),
-    MessageService,
   ],
 })
 export class ReminderModule {}
