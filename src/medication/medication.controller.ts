@@ -57,7 +57,7 @@ export class MedicationController {
   }
 
   @Post('')
-  @ApiOperation({ summary: 'Create medication and reminders' })
+  @ApiOperation({ summary: 'Create medication' })
   createMedication(@Body() dto: CreateMedicationDto) {
     return this.medicationService.createMedication(dto);
   }
@@ -93,5 +93,11 @@ export class MedicationController {
   @ApiOperation({ summary: 'Delete  a reminder' })
   deleteReminder(@Param('reminderId') reminderId: string) {
     return this.medicationService.deleteReminder(reminderId);
+  }
+
+  @Get('reminder/details/:reminderId')
+  @ApiOperation({ summary: 'Get reminder details by id' })
+  getRminderDetailsById(@Param('reminderId') reminderId: string) {
+    return this.medicationService.getRminderDetailsById(reminderId);
   }
 }
