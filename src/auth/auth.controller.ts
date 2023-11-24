@@ -11,6 +11,7 @@ import { ApiOperation, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { RegisterUserDto } from './dto/register-patient.dto';
 import { JwtGuard } from './guards/jwt.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
 
 @ApiTags('auth-endpoints')
 @Controller('auth')
@@ -44,5 +45,21 @@ export class AuthController {
     @Param('userId') userId: string,
   ) {
     return this.authService.changePassword(dto, userId);
+  }
+
+  @UseGuards(JwtGuard)
+  @ApiSecurity('JWT-auth')
+  @ApiOperation({ summary: 'Request email verification otp' })
+  @Post('request-verification-email/:userId')
+  requestEmailVerification(@Param('userId') userId: string) {
+    return this.authService.requestEmailVerification(userId);
+  }
+
+  @UseGuards(JwtGuard)
+  @ApiSecurity('JWT-auth')
+  @Patch('verify-email/:userId')
+  @ApiOperation({ summary: 'Verify email' })
+  verifyEmail(@Body() dto: VerifyEmailDto, @Param('userId') userId: string) {
+    return this.authService.verifyEmail(userId, dto);
   }
 }
