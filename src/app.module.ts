@@ -9,6 +9,7 @@ import { MedicationModule } from './medication/medication.module';
 import { PatientModule } from './patient/patient.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ReminderModule } from './reminder/reminder.module';
+import { EmailNotificationModule } from './email-notification/email-notification.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ReminderModule } from './reminder/reminder.module';
     MedicationModule,
     PatientModule,
     ReminderModule,
+    EmailNotificationModule,
   ],
 })
 export class AppModule {}
