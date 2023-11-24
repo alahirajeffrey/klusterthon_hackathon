@@ -18,7 +18,7 @@ export class ReminderService {
 
   @Cron(CronExpression.EVERY_30_MINUTES)
   async triggerReminder() {
-    const reminders = await this.reminderModel.find();
+    const reminders = await this.reminderModel.find({ time: {} });
 
     // loop through reminders and send text message
     for (let i = 0; i < reminders.length; i++) {
