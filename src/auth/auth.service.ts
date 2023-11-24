@@ -11,6 +11,10 @@ import * as bcrypt from 'bcryptjs';
 import { ApiResponse } from 'src/common/types/response.type';
 import { ConfigService } from '@nestjs/config';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
+import { EmailNotificationService } from 'src/email-notification/email-notification.service';
+import { UtilService } from 'src/utils/util.service';
+import { Otp } from 'src/schemas/otp.schema';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +24,9 @@ export class AuthService {
     private jwtService: JwtService,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
     private readonly config: ConfigService,
+    private emailService: EmailNotificationService,
+    private utilService: UtilService,
+    @InjectModel(Otp.name) private otpModel: Model<Otp>,
   ) {}
 
   /**
@@ -287,6 +294,116 @@ export class AuthService {
       return {
         statusCode: HttpStatus.OK,
         message: { message: 'Password changed successfully' },
+      };
+    } catch (error) {
+      this.logger.error(error);
+      throw new HttpException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /**
+   * send email verification otp to user
+   * @param userId : id of user
+   * @returns : 200 and message
+   */
+  async requestEmailVerification(userId: string) {
+    try {
+      const patient = await this.patientModel.findById(userId);
+      if (!patient) {
+        const doctor = await this.doctorModel.findById(userId);
+        if (doctor) {
+          const otp = this.utilService.generateOtp();
+
+          await this.emailService.sendEmailVerificationOtp(
+            doctor.mobileNumber,
+            otp,
+          );
+
+          await this.otpModel.create({
+            otp: otp,
+            doctorId: userId,
+          });
+
+          return {
+            statusCode: HttpStatus.OK,
+            data: { message: 'Email verification otp sent' },
+          };
+        }
+
+        throw new HttpException('User does not exist', HttpStatus.NOT_FOUND);
+      }
+
+      const otp = this.utilService.generateOtp();
+
+      await this.emailService.sendEmailVerificationOtp(
+        patient.mobileNumber,
+        otp,
+      );
+
+      await this.otpModel.create({
+        otp: otp,
+        patientId: userId,
+      });
+
+      return {
+        statusCode: HttpStatus.OK,
+        data: { message: 'Email verification otp sent' },
+      };
+    } catch (error) {
+      this.logger.error(error);
+      throw new HttpException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async verifyEmail(userId: string, dto: VerifyEmailDto) {
+    try {
+      const patient = await this.patientModel.findById(userId);
+      if (!patient) {
+        const doctor = await this.doctorModel.findById(userId);
+        if (doctor) {
+          const userOtp = await this.otpModel.findById(userId);
+
+          if (userOtp.otp !== dto.otp) {
+            throw new HttpException('Incorrect otp', HttpStatus.UNAUTHORIZED);
+          }
+
+          await this.doctorModel.updateOne(
+            { _id: userId },
+            { isEmailVerified: true },
+          );
+
+          await this.otpModel.deleteOne({ _id: userOtp._id });
+
+          return {
+            statusCode: HttpStatus.OK,
+            message: { message: 'Email successfully verified' },
+          };
+        }
+
+        throw new HttpException('User does not exist', HttpStatus.NOT_FOUND);
+      }
+      const userOtp = await this.otpModel.findById(userId);
+
+      if (userOtp.otp !== dto.otp) {
+        throw new HttpException('Incorrect otp', HttpStatus.UNAUTHORIZED);
+      }
+
+      await this.patientModel.updateOne(
+        { _id: userId },
+        { isEmailVerified: true },
+      );
+
+      await this.otpModel.deleteOne({ _id: userOtp._id });
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: { message: 'Email successfully verified' },
       };
     } catch (error) {
       this.logger.error(error);
