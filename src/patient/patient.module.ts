@@ -9,10 +9,11 @@ import {
   Patient_Doctor,
   Patient_DoctorShema,
 } from 'src/schemas/patient_doctor.schema';
+import { UtilService } from 'src/utils/util.service';
 
 @Module({
   controllers: [PatientController],
-  providers: [PatientService],
+  providers: [PatientService, UtilService],
   imports: [
     MongooseModule.forFeature([
       { name: Patient.name, schema: PatientShema },
