@@ -11,10 +11,10 @@ export class Reminder {
   id: mongoose.Schema.Types.ObjectId;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Patient' })
-  patientId: Patient;
+  patientId: string;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Medication' })
-  medicationId: Medication;
+  medicationId: string;
 
   @Prop()
   time: Date;
