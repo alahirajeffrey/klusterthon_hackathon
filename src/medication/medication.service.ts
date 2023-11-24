@@ -185,7 +185,9 @@ export class MedicationService {
         );
       }
 
-      if (String(medication.patientId.id) !== String(patient._id)) {
+      console.log(medication.patientId);
+      console.log(patient._id);
+      if (String(medication.patientId) !== String(patient._id)) {
         throw new HttpException(
           'You cannot mark a medication that is not yours as complete',
           HttpStatus.NOT_FOUND,
@@ -311,7 +313,7 @@ export class MedicationService {
 
       return {
         statusCode: HttpStatus.CREATED,
-        data: { message: 'Drrug taken' },
+        data: { message: 'Drug taken' },
       };
     } catch (error) {
       this.logger.error(error);
@@ -363,6 +365,7 @@ export class MedicationService {
     dto: CreateReminderDto,
   ): Promise<ApiResponse> {
     try {
+      console.log(reminderId);
       const reminder = await this.reminderModel.findById(reminderId);
       if (!reminder) {
         throw new HttpException(
@@ -409,6 +412,34 @@ export class MedicationService {
       return {
         statusCode: HttpStatus.OK,
         data: { message: 'Reminder deleted' },
+      };
+    } catch (error) {
+      this.logger.error(error);
+      throw new HttpException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /**
+   * get details of a reminder
+   * @param reminderId : id of reminder
+   * @returns : 200 and reminder object
+   */
+  async getRminderDetailsById(reminderId: string): Promise<ApiResponse> {
+    try {
+      const reminder = await this.reminderModel.findOne({ _id: reminderId });
+      if (!reminder) {
+        throw new HttpException(
+          'Reminder does not exist',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      return {
+        statusCode: HttpStatus.OK,
+        data: { reminder },
       };
     } catch (error) {
       this.logger.error(error);
