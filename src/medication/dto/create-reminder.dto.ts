@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsDate, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateReminderDto {
   @IsString()
@@ -12,8 +13,9 @@ export class CreateReminderDto {
   @ApiProperty()
   medicationId: string;
 
-  @IsString()
+  @IsDate()
+  @Type(() => Date)
   @IsNotEmpty()
   @ApiProperty()
-  time: string;
+  time: Date;
 }
