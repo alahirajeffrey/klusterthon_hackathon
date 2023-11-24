@@ -18,7 +18,12 @@ export class ReminderService {
 
   @Cron(CronExpression.EVERY_30_MINUTES)
   async triggerReminder() {
-    const reminders = await this.reminderModel.find({ time: {} });
+    const currentTime = new Date();
+    const timeAfterThirtyMinutes = new Date(currentTime.getTime() + 30 * 60000);
+
+    const reminders = await this.reminderModel.find({
+      time: { $gte: currentTime, $lte: timeAfterThirtyMinutes },
+    });
 
     // loop through reminders and send text message
     for (let i = 0; i < reminders.length; i++) {
@@ -26,10 +31,10 @@ export class ReminderService {
 
       await this.messageService.sendTestMessage(
         reminder.patientMobileNumber,
-        `Its time to take your drugs. 
-        
+        `Its time to take your drugs.
+
         Medication name : ${reminder.medicationName}
-        
+
         Dosage: ${reminder.dosage}`,
       );
     }
