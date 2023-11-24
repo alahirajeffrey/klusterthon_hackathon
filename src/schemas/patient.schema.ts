@@ -11,6 +11,9 @@ export class Patient {
   @Prop()
   email: string;
 
+  @Prop({ default: false })
+  isEmailVerified: boolean;
+
   @Prop()
   password: string;
 
