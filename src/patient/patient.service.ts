@@ -81,7 +81,7 @@ export class PatientService {
     try {
       const patientsDoctors = await this.patientDoctorModel
         .find({
-          id: patientId,
+          patientId: patientId,
         })
         .sort({ createdAt: -1 });
 
@@ -125,7 +125,7 @@ export class PatientService {
 
       await this.patientModel.updateOne(
         {
-          id: patientId,
+          _id: patientId,
         },
         {
           firstName: dto.firstName,
