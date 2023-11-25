@@ -24,7 +24,7 @@ export class PatientController {
   }
 
   @Get('doctor/:patientId')
-  @ApiOperation({ summary: 'Get a patient currnt doctor' })
+  @ApiOperation({ summary: 'Get a patient current doctor' })
   getPatientsDoctor(@Param('patientId') patientId: string) {
     return this.patientService.getPatientsDoctor(patientId);
   }
