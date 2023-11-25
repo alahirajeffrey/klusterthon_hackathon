@@ -63,6 +63,31 @@ export class MedicationService {
   }
 
   /**
+   * get all a patient's current medicaton
+   * @param patientId : id of patient
+   * @returns 200 and list of medication objects
+   */
+  async getAllCurrentMedications(patientId: string) {
+    try {
+      const currentMedications = await this.medicationModel.find({
+        _id: patientId,
+        isCompleted: false,
+      });
+
+      return {
+        statusCode: HttpStatus.OK,
+        data: { currentMedications },
+      };
+    } catch (error) {
+      this.logger.error(error);
+      throw new HttpException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /**
    * change a patient's medication
    * @param medicationId : id of medication
    * @param doctorId : id of doctor
@@ -185,8 +210,6 @@ export class MedicationService {
         );
       }
 
-      console.log(medication.patientId);
-      console.log(patient._id);
       if (String(medication.patientId) !== String(patient._id)) {
         throw new HttpException(
           'You cannot mark a medication that is not yours as complete',
