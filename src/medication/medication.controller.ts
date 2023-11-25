@@ -6,25 +6,32 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { MedicationService } from './medication.service';
-// import { JwtGuard } from 'src/auth/guards/jwt.guard';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
+import { ApiOperation, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { ChangeMedicationDto } from './dto/update-medication.dto';
 import { CreateMedicationDto } from './dto/create-medication.dto';
 import { CreateReminderDto } from './dto/create-reminder.dto';
 
-// @UseGuards(JwtGuard)
-// @ApiSecurity('JWT-auth')
+@UseGuards(JwtGuard)
+@ApiSecurity('JWT-auth')
 @ApiTags('medication-endpoints')
 @Controller('medication')
 export class MedicationController {
   constructor(private medicationService: MedicationService) {}
 
   @Get(':medicationId')
-  @ApiOperation({ summary: 'Get a patient medication by id' })
-  getPatientById(@Param('medicationId') medicationId: string) {
+  @ApiOperation({ summary: 'Get a single patient medication by id' })
+  getMedicationDetailsById(@Param('medicationId') medicationId: string) {
     return this.medicationService.getMedicationDetailsById(medicationId);
+  }
+
+  @Get('current/:patientId')
+  @ApiOperation({ summary: 'Get all a patient current medications' })
+  getAllCurrentMedications(@Param('patientId') patientId: string) {
+    return this.medicationService.getAllCurrentMedications(patientId);
   }
 
   @Patch(':medicationId/:doctorId')
