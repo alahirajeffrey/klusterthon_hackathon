@@ -9,10 +9,10 @@ export class Patient_Doctor {
   id: mongoose.Schema.Types.ObjectId;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Patient' })
-  patient: string;
+  patientId: string;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Doctor' })
-  doctor: string;
+  doctorId: string;
 }
 
 export const Patient_DoctorShema = SchemaFactory.createForClass(Patient_Doctor);
