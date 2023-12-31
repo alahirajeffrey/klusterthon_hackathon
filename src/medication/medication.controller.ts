@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { MedicationService } from './medication.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
@@ -28,39 +29,47 @@ export class MedicationController {
     return this.medicationService.getMedicationDetailsById(medicationId);
   }
 
-  @Get('current/:patientId')
+  @Get('current')
   @ApiOperation({ summary: 'Get all a patient current medications' })
-  getAllCurrentMedications(@Param('patientId') patientId: string) {
-    return this.medicationService.getAllCurrentMedications(patientId);
+  getAllCurrentMedications(
+    @Request() req,
+    // @Param('patientId') patientId: string
+  ) {
+    return this.medicationService.getAllCurrentMedications(req.user.sub);
   }
 
-  @Patch(':medicationId/:doctorId')
+  @Patch(':medicationId')
   @ApiOperation({ summary: 'Change a patient medication' })
   changePatientMedication(
     @Param('medicationId') medicationId: string,
-    @Param('doctorId') doctorId: string,
+    // @Param('doctorId') doctorId: string,
     @Body() dto: ChangeMedicationDto,
+    @Request() req,
   ) {
     return this.medicationService.changePatientMedication(
       medicationId,
-      doctorId,
+      req.user.sub,
       dto,
     );
   }
 
-  @Get('patient/:patientId')
+  @Get('patient')
   @ApiOperation({ summary: 'Get patient history' })
-  getPatientHistory(@Param('patientId') patientId: string) {
-    return this.medicationService.getPatientHistory(patientId);
+  getPatientHistory(
+    @Request() req,
+    // @Param('patientId') patientId: string
+  ) {
+    return this.medicationService.getPatientHistory(req.user.sub);
   }
 
-  @Patch('complete/:medicationId/:patientId')
+  @Patch('complete/:medicationId')
   @ApiOperation({ summary: 'Complete a medication' })
   completeMedication(
     @Param('medicationId') medicationId: string,
-    @Param('patientId') patientId: string,
+    // @Param('patientId') patientId: string,
+    @Request() req,
   ) {
-    return this.medicationService.completeMedication(patientId, medicationId);
+    return this.medicationService.completeMedication(req.sub.id, medicationId);
   }
 
   @Post('')

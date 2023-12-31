@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Patch,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { ApiOperation, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { PatientService } from './patient.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
@@ -11,10 +18,13 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class PatientController {
   constructor(private patientService: PatientService) {}
 
-  @Get(':patientId')
+  @Get('')
   @ApiOperation({ summary: 'Get a patient by id' })
-  getPatientById(@Param('patientId') patientId: string) {
-    return this.patientService.getPatientById(patientId);
+  getPatientById(
+    @Request() req,
+    // @Param('patientId') patientId: string
+  ) {
+    return this.patientService.getPatientById(req.user.sub);
   }
 
   @Get('')
@@ -23,18 +33,22 @@ export class PatientController {
     return this.patientService.getAllPatients();
   }
 
-  @Get('doctor/:patientId')
+  @Get('doctor')
   @ApiOperation({ summary: 'Get a patient current doctor' })
-  getPatientsDoctor(@Param('patientId') patientId: string) {
-    return this.patientService.getPatientsDoctor(patientId);
+  getPatientsDoctor(
+    @Request() req,
+    // @Param('patientId') patientId: string
+  ) {
+    return this.patientService.getPatientsDoctor(req.user.sub);
   }
 
-  @Patch(':patientId')
+  @Patch('')
   @ApiOperation({ summary: 'Update a patient details' })
   updatePatientDetials(
-    @Param('patientId') patientId: string,
+    // @Param('patientId') patientId: string,
     @Body() dto: UpdateUserDto,
+    @Request() req,
   ) {
-    return this.patientService.updatePatientDetials(patientId, dto);
+    return this.patientService.updatePatientDetials(req.user.id, dto);
   }
 }

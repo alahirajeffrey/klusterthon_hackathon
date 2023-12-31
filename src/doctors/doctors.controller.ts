@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Request } from '@nestjs/common';
 import { DoctorsService } from './doctors.service';
 import { ApiOperation } from '@nestjs/swagger';
 import { UpdateDoctorDto } from './dto/update-doctor.dto';
@@ -7,10 +7,13 @@ import { UpdateDoctorDto } from './dto/update-doctor.dto';
 export class DoctorsController {
   constructor(private doctorService: DoctorsService) {}
 
-  @Get(':doctorId')
+  @Get('')
   @ApiOperation({ summary: 'Get a doctor by id' })
-  getDoctorDetailsById(@Param('doctorId') doctorId: string) {
-    return this.doctorService.getDoctorDetailsById(doctorId);
+  getDoctorDetailsById(
+    @Request() req,
+    // @Param('doctorId') doctorId: string
+  ) {
+    return this.doctorService.getDoctorDetailsById(req.user.sub);
   }
 
   @Get('')
@@ -19,18 +22,22 @@ export class DoctorsController {
     return this.doctorService.getAllDoctors();
   }
 
-  @Get('patients/:doctorId')
+  @Get('patients')
   @ApiOperation({ summary: 'Get all a doctor patients' })
-  getDoctorPatients(@Param('doctorId') doctorId: string) {
-    return this.doctorService.getDoctorPatients(doctorId);
+  getDoctorPatients(
+    @Request() req,
+    // @Param('doctorId') doctorId: string
+  ) {
+    return this.doctorService.getDoctorPatients(req.user.sub);
   }
 
-  @Patch(':doctorId')
+  @Patch('')
   @ApiOperation({ summary: 'Update a doctor details' })
   updateDoctorDetails(
-    @Param('doctorId') doctorId: string,
+    @Request() req,
+    // @Param('doctorId') doctorId: string,
     @Body() dto: UpdateDoctorDto,
   ) {
-    return this.doctorService.updateDoctorDetails(doctorId, dto);
+    return this.doctorService.updateDoctorDetails(req.user.sub, dto);
   }
 }

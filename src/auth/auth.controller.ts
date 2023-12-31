@@ -1,10 +1,10 @@
 import {
   Body,
   Controller,
-  Param,
   Patch,
   Post,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiOperation, ApiSecurity, ApiTags } from '@nestjs/swagger';
@@ -38,28 +38,36 @@ export class AuthController {
 
   @UseGuards(JwtGuard)
   @ApiSecurity('JWT-auth')
-  @Patch('change-password/:userId')
+  @Patch('change-password')
   @ApiOperation({ summary: 'Change user password' })
   changePassword(
+    @Request() req,
     @Body() dto: ChangePasswordDto,
-    @Param('userId') userId: string,
+    // @Param('userId') userId: string,
   ) {
-    return this.authService.changePassword(dto, userId);
+    return this.authService.changePassword(dto, req.user.sub);
   }
 
   @UseGuards(JwtGuard)
   @ApiSecurity('JWT-auth')
   @ApiOperation({ summary: 'Request email verification otp' })
-  @Post('request-verification-email/:userId')
-  requestEmailVerification(@Param('userId') userId: string) {
-    return this.authService.requestEmailVerification(userId);
+  @Post('request-verification-email')
+  requestEmailVerification(
+    @Request() req,
+    // @Param('userId') userId: string
+  ) {
+    return this.authService.requestEmailVerification(req.user.sub);
   }
 
   @UseGuards(JwtGuard)
   @ApiSecurity('JWT-auth')
-  @Patch('verify-email/:userId')
+  @Patch('verify-email')
   @ApiOperation({ summary: 'Verify email' })
-  verifyEmail(@Body() dto: VerifyEmailDto, @Param('userId') userId: string) {
-    return this.authService.verifyEmail(userId, dto);
+  verifyEmail(
+    @Body() dto: VerifyEmailDto,
+    // @Param('userId') userId: string
+    @Request() req,
+  ) {
+    return this.authService.verifyEmail(req.user.sub, dto);
   }
 }
