@@ -36,25 +36,25 @@ Develop a digital solution to improve medication adherence for chronic patients.
 
 Ensure you have all the requirements
 
-## Cloning Repo
+### Cloning Repo
 
 ```bash
 $ git clone https://github.com/alahirajeffrey/klusterthon_hackathon.git
 ```
 
-## Installation
+### Installation
 
 ```bash
 $ npm install
 ```
 
-## Setting up
+### Setting up
 
 - Create a .env file at the root of the application.
 - Copy the content of the .env.example file to the newly created .env file
 - Fill appropraitely
 
-## Running the app
+### Running the app
 
 ```bash
 # development
