@@ -122,7 +122,7 @@ export class DoctorsService {
       );
       return {
         statusCode: HttpStatus.OK,
-        data: { message: 'Doctor records updated' },
+        message: 'Doctor records updated',
       };
     } catch (error) {
       this.logger.error(error);

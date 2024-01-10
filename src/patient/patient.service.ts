@@ -136,7 +136,7 @@ export class PatientService {
 
       return {
         statusCode: HttpStatus.OK,
-        data: { message: 'Patient records updated' },
+        message: 'Patient records updated',
       };
     } catch (error) {
       this.logger.error(error);

@@ -287,7 +287,7 @@ export class AuthService {
 
         return {
           statusCode: HttpStatus.OK,
-          message: { message: 'Password changed successfully' },
+          message: 'Password changed successfully',
         };
       }
 
@@ -319,7 +319,7 @@ export class AuthService {
 
       return {
         statusCode: HttpStatus.OK,
-        message: { message: 'Password changed successfully' },
+        message: 'Password changed successfully',
       };
     } catch (error) {
       this.logger.error(error);
@@ -358,7 +358,7 @@ export class AuthService {
 
           return {
             statusCode: HttpStatus.OK,
-            data: { message: 'Email verification otp sent' },
+            data: 'Email verification otp sent',
           };
         }
 
@@ -381,7 +381,7 @@ export class AuthService {
 
       return {
         statusCode: HttpStatus.OK,
-        data: { message: 'Email verification otp sent' },
+        data: 'Email verification otp sent',
       };
     } catch (error) {
       this.logger.error(error);
@@ -422,7 +422,7 @@ export class AuthService {
 
           return {
             statusCode: HttpStatus.OK,
-            message: { message: 'Email successfully verified' },
+            message: 'Email successfully verified',
           };
         }
 
@@ -446,7 +446,7 @@ export class AuthService {
 
       return {
         statusCode: HttpStatus.OK,
-        message: { message: 'Email successfully verified' },
+        message: 'Email successfully verified',
       };
     } catch (error) {
       this.logger.error(error);

@@ -159,7 +159,7 @@ export class MedicationService {
         .find({ patientId: patientId })
         .sort({ createdAt: -1 });
 
-      console.log(history);
+      // console.log(history);
       if (history.length === 0) {
         throw new HttpException(
           'Patient history not found',
@@ -224,7 +224,7 @@ export class MedicationService {
 
       return {
         statusCode: HttpStatus.OK,
-        data: { message: 'Medication completed' },
+        message: 'Medication completed',
       };
     } catch (error) {
       this.logger.error(error);
@@ -336,7 +336,7 @@ export class MedicationService {
 
       return {
         statusCode: HttpStatus.CREATED,
-        data: { message: 'Drug taken' },
+        message: 'Drug taken',
       };
     } catch (error) {
       this.logger.error(error);
@@ -404,7 +404,7 @@ export class MedicationService {
 
       return {
         statusCode: HttpStatus.OK,
-        data: { message: 'Reminder updated' },
+        message: 'Reminder updated',
       };
     } catch (error) {
       this.logger.error(error);
@@ -434,7 +434,7 @@ export class MedicationService {
 
       return {
         statusCode: HttpStatus.OK,
-        data: { message: 'Reminder deleted' },
+        message: 'Reminder deleted',
       };
     } catch (error) {
       this.logger.error(error);
