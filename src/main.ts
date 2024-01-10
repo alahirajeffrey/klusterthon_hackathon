@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import * as cors from 'cors';
+import { config } from './common/config/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -26,7 +27,7 @@ async function bootstrap() {
   );
 
   // setup swagger
-  const config = new DocumentBuilder()
+  const swagger_config = new DocumentBuilder()
     .setTitle('Klusterthon hackathon')
     .setVersion('1.0')
     .addBearerAuth(
@@ -41,9 +42,9 @@ async function bootstrap() {
       'JWT-auth',
     )
     .build();
-  const document = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, swagger_config);
   SwaggerModule.setup('api/v1/api-doc', app, document);
 
-  await app.listen(Number(process.env.NODE_PORT) || 3001);
+  await app.listen(config.PORT || 3001);
 }
 bootstrap();
