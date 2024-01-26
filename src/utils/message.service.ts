@@ -12,8 +12,8 @@ export class MessageService {
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {
     this.client = twilio(
-      config.get('TWILIO_ACCOUNT_SID'),
-      config.get('TWILIO_AUTH_TOKEN'),
+      config.get('TWILIO_ACCOUNT_SID') || 'AC',
+      config.get('TWILIO_AUTH_TOKEN') || '',
     );
   }
 
