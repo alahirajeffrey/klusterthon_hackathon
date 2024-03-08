@@ -13,3 +13,13 @@ services:
     ports:
       - '27017: 27017'
   api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api
+    environment:
+      - PORT=${MONGO_USERNAME}
+    ports:
+      - '3000:3000'
+    depends_on:
+      - mongodb
